@@ -1,6 +1,7 @@
 package com.example.demo1.customer;
 
 import com.example.demo1.customer.Customer;
+import com.example.demo1.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -11,21 +12,19 @@ import java.util.List;
 
 @Service
 public class CustomerService {
-    private final CustomerRepo customerRepo;
+    private final CustomerRepository customerRepository;
     @Autowired
-    public CustomerService(CustomerRepo customerRepo){
-        this.customerRepo = customerRepo;
+    public CustomerService(CustomerRepository customerRepository){
+        this.customerRepository = customerRepository;
     }
 
     List<Customer> getCustomers(){
-        return customerRepo.getCustomers();
+        return customerRepository.findAll();
     }
 
     Customer getCustomer(long id) {
-        return getCustomers()
-                .stream()
-                .filter(customer -> customer.getId() == id)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Customer " + id + " does not exist")
+        return customerRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Customer with id " + id + " does not exist")
                 );}
 }
